@@ -39,6 +39,8 @@ python -m src.train --config configs/base.yaml --dataset imdb --epochs 8
 # Classify, and show what drove the decision
 python -m src.predict --checkpoint runs/base/best.pt \
     --text "not brilliant, and utterly tedious" --explain
+
+pytest    # 40 tests
 ```
 
 ## Why byte-pair encoding
