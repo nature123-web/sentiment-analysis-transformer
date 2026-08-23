@@ -100,6 +100,28 @@ def test_encode_truncates_to_max_length():
     assert ids[-1] == EOS_ID, "truncation must preserve the end-of-sequence token"
 
 
+def test_truncation_does_not_duplicate_eos():
+    """The tail slice used to include the original trailing EOS, and a fresh
+    one was appended after it -- every truncated sequence ended EOS, EOS,
+    silently discarding one real content token from the tail.
+    """
+    tok = train_tokenizer()
+    ids = tok.encode("the film was brilliant and utterly gripping " * 20,
+                     max_length=24)
+    assert ids.count(EOS_ID) == 1
+    assert ids[-2] != EOS_ID
+
+
+@pytest.mark.parametrize("max_length", [4, 5, 6, 10, 24, 50])
+def test_truncation_never_duplicates_eos_across_lengths(max_length):
+    tok = train_tokenizer()
+    ids = tok.encode("the film was brilliant and utterly gripping " * 20,
+                     max_length=max_length)
+    assert len(ids) == max_length
+    assert ids.count(EOS_ID) == 1
+    assert ids[-1] == EOS_ID
+
+
 def test_truncation_keeps_both_ends_of_the_document():
     """Middle-out truncation: the opening and the conclusion both survive."""
     tok = BPETokenizer(vocab_size=300, min_frequency=1).train(

@@ -40,7 +40,7 @@ python -m src.train --config configs/base.yaml --dataset imdb --epochs 8
 python -m src.predict --checkpoint runs/base/best.pt \
     --text "not brilliant, and utterly tedious" --explain
 
-pytest    # 40 tests
+pytest    # 47 tests
 ```
 
 ## Why byte-pair encoding

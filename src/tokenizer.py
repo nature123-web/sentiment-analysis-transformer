@@ -139,7 +139,14 @@ class BPETokenizer:
                 # only the end throws away the conclusion.
                 keep = max_length - 1
                 head = keep // 2
-                ids = ids[:head] + ids[len(ids) - (keep - head):] + [EOS_ID]
+                tail = keep - head
+                # Drop the trailing EOS before slicing: it is the last element
+                # of `ids`, so a tail slice taken from `ids` directly would
+                # include it, and appending EOS_ID afterwards would then
+                # duplicate it -- wasting one of the tail slots on a repeated
+                # token instead of real content.
+                body = ids[:-1]
+                ids = body[:head] + body[len(body) - tail:] + [EOS_ID]
             else:
                 ids = ids + [PAD_ID] * (max_length - len(ids))
         return ids
