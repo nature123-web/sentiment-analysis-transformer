@@ -195,3 +195,19 @@ def test_ece_detects_overconfidence():
     probs = np.tile([0.95, 0.05], (100, 1))
     y = np.array([0] * 50 + [1] * 50)
     assert expected_calibration_error(y, probs) == pytest.approx(0.45, abs=0.02)
+
+
+def test_render_importance_is_printable_on_a_legacy_console_codepage():
+    """render_importance used to build its bar with the Unicode block
+    character '█', which crashes with UnicodeEncodeError the moment it
+    reaches print() on a console still using cp1252 -- the Windows default
+    outside Windows Terminal. The whole point of the report is that it
+    gets printed, so the string this returns must survive that encoding.
+    """
+    from src.predict import render_importance
+
+    tokens = ["the", "movie", "was", "great"]
+    importance = np.array([0.1, 0.8, 0.05, 0.9])
+    valid = np.array([True, True, True, True])
+    text = render_importance(tokens, importance, valid, top_k=4)
+    text.encode("cp1252")  # raises UnicodeEncodeError on a regression

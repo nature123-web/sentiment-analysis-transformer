@@ -71,7 +71,11 @@ def render_importance(tokens, importance, valid, top_k: int = 12) -> str:
         if not valid[i] or shown >= top_k:
             continue
         weight = importance[i] / max(importance.max(), 1e-9)
-        bar = "█" * int(round(weight * 30))
+        # ASCII rather than a Unicode block character: this string goes
+        # straight to print(), and a console stuck on a legacy codepage
+        # (cp1252 is still the Windows default outside Windows Terminal)
+        # raises UnicodeEncodeError on U+2588 instead of printing the report.
+        bar = "#" * int(round(weight * 30))
         lines.append(f"  {tokens[i]:<18} {importance[i]:.4f} {bar}")
         shown += 1
     return "\n".join(lines)
