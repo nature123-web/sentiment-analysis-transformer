@@ -148,7 +148,7 @@ def main() -> None:
             )
             optimizer.step()
             scheduler.step()
-            total += float(loss) * ids.size(0)
+            total += float(loss.detach()) * ids.size(0)
             seen += ids.size(0)
 
         y_true, logits = collect(model, loaders["val"], device)
